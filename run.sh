@@ -38,6 +38,7 @@ cp /home/steam/crontab /ark/template/crontab
 [ ! -d /ark/staging ] && mkdir /ark/staging
 [ ! -L /ark/Game.ini ] && ln -s server/ShooterGame/Saved/Config/LinuxServer/Game.ini Game.ini
 [ ! -L /ark/GameUserSettings.ini ] && ln -s server/ShooterGame/Saved/Config/LinuxServer/GameUserSettings.ini GameUserSettings.ini
+[ ! -L /ark/PlayersExclusiveJoinList.txt ] && ln -s server/ShooterGame/Binaries/Linux/PlayersExclusiveJoinList.txt PlayersExclusiveJoinList.txt
 [ ! -f /ark/crontab ] && cp /ark/template/crontab /ark/crontab
 
 
@@ -47,6 +48,7 @@ if [ ! -d /ark/server  ] || [ ! -f /ark/server/arkversion ];then
 	mkdir -p /ark/server/ShooterGame/Saved/SavedArks
 	mkdir -p /ark/server/ShooterGame/Content/Mods
 	mkdir -p /ark/server/ShooterGame/Binaries/Linux/
+	touch /ark/server/ShooterGame/Binaries/Linux/PlayersExclusiveJoinList.txt
 	touch /ark/server/ShooterGame/Binaries/Linux/ShooterGameServer
 	arkmanager install
 	# Create mod dir

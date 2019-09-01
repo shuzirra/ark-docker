@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-MAINTAINER TuRzAm
+MAINTAINER Shuzirra
 
 # Var for first config
 # Server Name
@@ -12,19 +12,19 @@ ENV SERVERPASSWORD ""
 # Admin password
 ENV ADMINPASSWORD "adminpassword"
 # Nb Players
-ENV NBPLAYERS 70
+ENV NBPLAYERS 5
 # If the server is updating when start with docker start
 ENV UPDATEONSTART 1
 # if the server is backup when start with docker start
 ENV BACKUPONSTART 1
 #  Tag on github for ark server tools
-ENV GIT_TAG v1.5
+ENV GIT_TAG v1.6.47
 # Server PORT (you can't remap with docker, it doesn't work)
 ENV SERVERPORT 27015
 # Steam port (you can't remap with docker, it doesn't work)
 ENV STEAMPORT 7778
 # if the server should backup after stopping
-ENV BACKUPONSTOP 0
+ENV BACKUPONSTOP 1
 # If the server warn the players before stopping
 ENV WARNONSTOP 0
 # UID of the user steam
@@ -34,7 +34,7 @@ ENV GID 1000
 
 # Install dependencies 
 RUN apt-get update &&\ 
-    apt-get install -y curl lib32gcc1 lsof git
+    apt-get install -y curl lib32gcc1 lsof git mc
 
 # Enable passwordless sudo for users under the "sudo" group
 RUN sed -i.bkp -e \
@@ -53,10 +53,12 @@ RUN usermod -a -G sudo steam
 # Copy & rights to folders
 COPY run.sh /home/steam/run.sh
 COPY user.sh /home/steam/user.sh
+COPY backup.sh /home/steam/backup.sh
 COPY crontab /home/steam/crontab
 COPY arkmanager-user.cfg /home/steam/arkmanager.cfg
 
 RUN touch /root/.bash_profile
+RUN chmod 777 /home/steam/backup.sh
 RUN chmod 777 /home/steam/run.sh
 RUN chmod 777 /home/steam/user.sh
 RUN mkdir  /ark
@@ -73,6 +75,8 @@ RUN ./install.sh steam
 
 # Allow crontab to call arkmanager
 RUN ln -s /usr/local/bin/arkmanager /usr/bin/arkmanager
+# Workaround for ubuntu 14.04 not having the runuser command
+RUN ln -s /bin/su /bin/runuser
 
 # Define default config file in /etc/arkmanager
 COPY arkmanager-system.cfg /etc/arkmanager/arkmanager.cfg
@@ -100,7 +104,7 @@ EXPOSE ${STEAMPORT}/udp ${SERVERPORT}/udp
 
 VOLUME  /ark 
 
-# Change the working directory to /arkd
+# Change the working directory to /ark
 WORKDIR /ark
 
 # Update game launch the game.
